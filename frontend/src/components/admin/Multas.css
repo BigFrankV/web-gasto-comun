@@ -8,6 +8,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
 }
 
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
 .estado-pendiente {
   color: #faad14;
   font-weight: 500;
@@ -16,6 +23,16 @@
 .estado-pagado {
   color: #52c41a;
   font-weight: 500;
+}
+
+.btn-marcar-pagada {
+  background-color: #52c41a;
+  border-color: #52c41a;
+}
+
+.btn-marcar-pagada:hover {
+  background-color: #73d13d;
+  border-color: #73d13d;
 }
 
 /* Estilos para el formulario */

@@ -8,6 +8,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
 }
 
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
 .btn-pagar {
   background-color: #52c41a;
   border-color: #52c41a;

@@ -1,105 +1,144 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Card, Button, Space, Modal, Form, Input, DatePicker, Select, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Card, Button, Space, Modal, Form, Input, DatePicker, Select, message, Spin, Tooltip, Tag } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import axios from 'axios';
+import moment from 'moment';
+import { useAuth } from '../../context/AuthContext';
 import './Multas.css';
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 const Multas = () => {
   const [multas, setMultas] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState(null);
+  const { user, token } = useAuth();
 
-  // Datos de ejemplo para multas
+  // Configuración de axios con el token de autenticación
+  const authAxios = axios.create({
+    baseURL: 'http://localhost:8000',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // Configurar interceptor para actualizar el token si cambia
   useEffect(() => {
+    // Crear un nuevo interceptor cada vez que el token cambie
+    const interceptor = authAxios.interceptors.request.use(
+      config => {
+        // Actualizar el token en cada solicitud
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      error => {
+        return Promise.reject(error);
+      }
+    );
+
+    // Limpiar el interceptor anterior cuando el token cambie
+    return () => {
+      authAxios.interceptors.request.eject(interceptor);
+    };
+  }, [token]);
+
+  // Cargar multas desde la API
+  const cargarMultas = async () => {
+    if (!token) {
+      message.error('No hay token de autenticación');
+      return;
+    }
     setLoading(true);
-    // Simulación de carga de datos
-    setTimeout(() => {
-      const multasEjemplo = [
-        {
-          id: 1,
-          residente: 'Juan Pérez',
-          motivo: 'Ruido excesivo',
-          monto: 25000,
-          fecha: '2025-02-15',
-          estado: 'pendiente',
-        },
-        {
-          id: 2,
-          residente: 'María González',
-          motivo: 'Estacionamiento indebido',
-          monto: 15000,
-          fecha: '2025-02-20',
-          estado: 'pagado',
-        },
-        {
-          id: 3,
-          residente: 'Carlos Rodríguez',
-          motivo: 'Daños a áreas comunes',
-          monto: 50000,
-          fecha: '2025-03-01',
-          estado: 'pendiente',
-        },
-        {
-          id: 4,
-          residente: 'Ana Martínez',
-          motivo: 'Mascota sin supervisión',
-          monto: 20000,
-          fecha: '2025-03-05',
-          estado: 'pendiente',
-        },
-      ];
-      setMultas(multasEjemplo);
+    try {
+      const response = await authAxios.get('/api/multas/');
+      setMultas(response.data);
+    } catch (error) {
+      console.error('Error al cargar multas:', error);
+      message.error('No se pudieron cargar las multas. Por favor, intente nuevamente.');
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+    }
+  };
+
+  // Cargar usuarios residentes desde la API
+  const cargarUsuarios = async () => {
+    if (!token) {
+      message.error('No hay token de autenticación');
+      return;
+    }
+    try {
+      const response = await authAxios.get('/api/auth/usuarios/?rol=residente');
+      setUsuarios(response.data);
+    } catch (error) {
+      console.error('Error al cargar usuarios:', error);
+      message.error('No se pudieron cargar los usuarios. Por favor, intente nuevamente.');
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    if (token) {
+      cargarMultas();
+      cargarUsuarios();
+    }
+  }, [token]);
 
   const showModal = (record = null) => {
     if (record) {
       setEditingId(record.id);
       form.setFieldsValue({
-        residente: record.residente,
+        usuario: record.usuario,
         motivo: record.motivo,
+        descripcion: record.descripcion || '',
         monto: record.monto,
-        fecha: record.fecha,
         estado: record.estado,
+        fecha_pago: record.fecha_pago ? moment(record.fecha_pago) : null,
       });
     } else {
       setEditingId(null);
       form.resetFields();
+      form.setFieldsValue({
+        estado: 'pendiente',
+      });
     }
     setModalVisible(true);
   };
-
+   
   const handleCancel = () => {
     setModalVisible(false);
     form.resetFields();
   };
 
-  const handleSubmit = (values) => {
-    if (editingId) {
-      // Actualizar multa existente
-      setMultas(
-        multas.map((multa) =>
-          multa.id === editingId
-            ? { ...multa, ...values }
-            : multa
-        )
-      );
-      message.success('Multa actualizada correctamente');
-    } else {
-      // Crear nueva multa
-      const newMulta = {
-        id: Math.max(...multas.map((m) => m.id), 0) + 1,
-        ...values,
-      };
-      setMultas([...multas, newMulta]);
-      message.success('Multa creada correctamente');
+  const handleSubmit = async (values) => {
+    try {
+      // Formatear fecha de pago si existe
+      if (values.fecha_pago) {
+        values.fecha_pago = values.fecha_pago.format('YYYY-MM-DD');
+      }
+
+      if (editingId) {
+        // Actualizar multa existente
+        await authAxios.put(`/api/multas/${editingId}/`, values);
+        message.success('Multa actualizada correctamente');
+      } else {
+        // Crear nueva multa
+        await authAxios.post('/api/multas/', values);
+        message.success('Multa creada correctamente');
+      }
+      
+      setModalVisible(false);
+      form.resetFields();
+      cargarMultas(); // Recargar la lista de multas
+    } catch (error) {
+      console.error('Error al guardar multa:', error);
+      message.error('Error al guardar la multa. Por favor, intente nuevamente.');
     }
-    setModalVisible(false);
-    form.resetFields();
   };
 
   const handleDelete = (id) => {
@@ -109,168 +148,177 @@ const Multas = () => {
       okText: 'Sí, eliminar',
       okType: 'danger',
       cancelText: 'Cancelar',
-      onOk() {
-        setMultas(multas.filter((multa) => multa.id !== id));
-        message.success('Multa eliminada correctamente');
+      onOk: async () => {
+        try {
+          await authAxios.delete(`/api/multas/${id}/`);
+          message.success('Multa eliminada correctamente');
+          cargarMultas(); // Recargar la lista de multas
+        } catch (error) {
+          console.error('Error al eliminar multa:', error);
+          message.error('Error al eliminar la multa. Por favor, intente nuevamente.');
+        }
       },
     });
+  };
+
+  const handleMarcarPagada = async (id) => {
+    try {
+      await authAxios.post(`/api/multas/${id}/marcar_como_pagada/`);
+      message.success('Multa marcada como pagada correctamente');
+      cargarMultas(); // Recargar la lista de multas
+    } catch (error) {
+      console.error('Error al marcar multa como pagada:', error);
+      message.error('Error al marcar la multa como pagada. Por favor, intente nuevamente.');
+    }
   };
 
   const columns = [
     {
       title: 'Residente',
-      dataIndex: 'residente',
-      key: 'residente',
-      sorter: (a, b) => a.residente.localeCompare(b.residente),
+      dataIndex: 'usuario_nombre',
+      key: 'usuario_nombre',
+      sorter: (a, b) => a.usuario_nombre.localeCompare(b.usuario_nombre),
     },
     {
       title: 'Motivo',
       dataIndex: 'motivo',
       key: 'motivo',
+      ellipsis: true,
     },
     {
       title: 'Monto',
       dataIndex: 'monto',
       key: 'monto',
-      render: (monto) => `$${monto.toLocaleString()}`,
+      render: (monto) => `$${Number(monto).toLocaleString()}`,
       sorter: (a, b) => a.monto - b.monto,
     },
     {
       title: 'Fecha',
-      dataIndex: 'fecha',
-      key: 'fecha',
-      sorter: (a, b) => new Date(a.fecha) - new Date(b.fecha),
-    },
-    {
-      title: 'Estado',
-      dataIndex: 'estado',
-      key: 'estado',
-      render: (estado) => (
-        <span className={`estado-${estado}`}>
-          {estado === 'pendiente' ? 'Pendiente' : 'Pagado'}
-        </span>
-      ),
-      filters: [
-        { text: 'Pendiente', value: 'pendiente' },
-        { text: 'Pagado', value: 'pagado' },
-      ],
-      onFilter: (value, record) => record.estado === value,
+      dataIndex: 'fecha_creacion',
+      key: 'fecha_creacion',
+      render: (fecha) => moment(fecha).format('DD/MM/YYYY'),
+      sorter: (a, b) => moment(a.fecha_creacion).unix() - moment(b.fecha_creacion).unix(),
     },
     {
       title: 'Acciones',
       key: 'acciones',
       render: (_, record) => (
-        <Space size="middle">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => showModal(record)}
-            size="small"
-          >
-            Editar
-          </Button>
-          <Button
-            type="danger"
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-            size="small"
-          >
-            Eliminar
-          </Button>
+        <Space>
+          <Tooltip title='Editar'>
+            <Button type='link' icon={<EditOutlined />} onClick={() => showModal(record)} />
+          </Tooltip>
+          <Tooltip title='Eliminar'>
+            <Button type='link' danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+          </Tooltip>
+          {record.estado === 'pendiente' && (
+            <Tooltip title='Marcar como pagada'>
+              <Button type='link' icon={<CheckCircleOutlined />} onClick={() => handleMarcarPagada(record.id)} />
+            </Tooltip>
+          )}
         </Space>
       ),
     },
   ];
 
   return (
-    <div className="multas-container">
-      <Card
-        title="Gestión de Multas"
-        extra={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => showModal()}
-          >
-            Nueva Multa
-          </Button>
-        }
-        className="multas-card"
-      >
-        <Table
-          columns={columns}
-          dataSource={multas}
-          rowKey="id"
-          loading={loading}
-          pagination={{ pageSize: 10 }}
-        />
-      </Card>
-
+    <Card
+      title='Multas'
+      extra={
+        <Button type='primary' icon={<PlusOutlined />} onClick={() => showModal()}>
+          Agregar Multa
+        </Button>
+      }
+    >
+      <Table
+        columns={columns}
+        dataSource={multas}
+        loading={loading}
+        rowKey='id'
+        pagination={{ pageSize: 10 }}
+      />
       <Modal
-        title={editingId ? 'Editar Multa' : 'Nueva Multa'}
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={handleCancel}
-        footer={null}
+        onOk={form.submit}
+        footer={[
+          <Button key='cancelar' onClick={handleCancel}>
+            Cancelar
+          </Button>,
+          <Button key='guardar' type='primary' onClick={form.submit}>
+            {editingId ? 'Actualizar' : 'Guardar'}
+          </Button>,
+        ]}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
+        <Form form={form} onFinish={handleSubmit} layout='vertical'>
           <Form.Item
-            name="residente"
-            label="Residente"
-            rules={[{ required: true, message: 'Por favor ingrese el nombre del residente' }]}
+            name='usuario'
+            label='Residente'
+            rules={[{ required: true, message: 'Seleccione un residente' }]}
           >
-            <Input placeholder="Nombre del residente" />
-          </Form.Item>
-          <Form.Item
-            name="motivo"
-            label="Motivo"
-            rules={[{ required: true, message: 'Por favor ingrese el motivo de la multa' }]}
-          >
-            <Input.TextArea placeholder="Motivo de la multa" rows={3} />
-          </Form.Item>
-          <Form.Item
-            name="monto"
-            label="Monto"
-            rules={[{ required: true, message: 'Por favor ingrese el monto de la multa' }]}
-          >
-            <Input
-              type="number"
-              prefix="$"
-              placeholder="Monto de la multa"
-              min={1}
-            />
-          </Form.Item>
-          <Form.Item
-            name="fecha"
-            label="Fecha"
-            rules={[{ required: true, message: 'Por favor seleccione la fecha' }]}
-          >
-            <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
-          </Form.Item>
-          <Form.Item
-            name="estado"
-            label="Estado"
-            rules={[{ required: true, message: 'Por favor seleccione el estado' }]}
-          >
-            <Select placeholder="Seleccione un estado">
-              <Option value="pendiente">Pendiente</Option>
-              <Option value="pagado">Pagado</Option>
+            <Select placeholder='Seleccione un residente'>
+              {usuarios.map((usuario) => (
+                <Option key={usuario.id} value={usuario.id}>
+                  {usuario.first_name} {usuario.last_name} - {usuario.numero_residencia || 'Sin residencia'}
+                </Option>
+              ))}
             </Select>
+          </Form.Item>
+          <Form.Item
+            name='motivo'
+            label='Motivo'
+            rules={[{ required: true, message: 'Ingrese el motivo' }]}
+          >
+            <Input placeholder='Ingrese el motivo' />
+          </Form.Item>
+          <Form.Item
+            name='monto'
+            label='Monto'
+            rules={[{ required: true, message: 'Ingrese el monto' }]}
+          >
+            <Input type='number' prefix="$" placeholder='Ingrese el monto' min={1} />
+          </Form.Item>
+          <Form.Item name='descripcion' label='Descripción'>
+            <TextArea rows={3} placeholder='Ingrese una descripción (opcional)' />
+          </Form.Item>
+          <Form.Item name='estado' label='Estado' initialValue='pendiente'>
+            <Select disabled={!!editingId}>
+              <Option value='pendiente'>Pendiente</Option>
+              <Option value='pagado'>Pagado</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name='fecha_pago'
+            label='Fecha de pago'
+            dependencies={['estado']}
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (getFieldValue('estado') === 'pagado' && !value) {
+                    return Promise.reject('Por favor seleccione la fecha de pago');
+                  }
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <DatePicker 
+              style={{ width: '100%' }} 
+              format="DD/MM/YYYY"
+              placeholder="Seleccione fecha de pago"
+              disabled={form.getFieldValue('estado') !== 'pagado'}
+            />
           </Form.Item>
           <Form.Item>
             <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button onClick={handleCancel}>Cancelar</Button>
               <Button type="primary" htmlType="submit">
-                {editingId ? 'Actualizar' : 'Crear'}
+                {editingId ? 'Actualizar' : 'Guardar'}
               </Button>
             </Space>
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </Card>
   );
 };
 

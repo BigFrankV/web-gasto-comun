@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import authService from '../services/authService';
+import axios from 'axios'; // Importar axios
 
 // Crear el contexto de autenticación
 const AuthContext = createContext();
@@ -7,6 +8,7 @@ const AuthContext = createContext();
 // Proveedor del contexto de autenticación
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,6 +16,14 @@ export const AuthProvider = ({ children }) => {
     const loadUser = () => {
       const currentUser = authService.getCurrentUser();
       setUser(currentUser);
+      if (currentUser && currentUser.access) {
+        setToken(currentUser.access);
+        // Configurar el token en el header por defecto para todas las solicitudes de axios
+        axios.defaults.headers.common['Authorization'] = `Bearer ${currentUser.access}`;
+      } else {
+        // Limpiar el header de autorización si no hay token
+        delete axios.defaults.headers.common['Authorization'];
+      }
       setLoading(false);
     };
 
@@ -25,6 +35,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.login(username, password);
       setUser(data);
+      if (data && data.access) {
+        setToken(data.access);
+        // Configurar el token en el header por defecto para todas las solicitudes de axios
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
+      }
       return data;
     } catch (error) {
       throw error;
@@ -35,6 +50,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     authService.logout();
     setUser(null);
+    setToken(null);
+    // Limpiar el header de autorización
+    delete axios.defaults.headers.common['Authorization'];
   };
 
   // Función para cambiar contraseña en el primer inicio de sesión
@@ -74,6 +92,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     isAdmin: user?.rol === 'admin',
     isFirstLogin: user?.first_login,
+    token,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

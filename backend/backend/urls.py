@@ -29,6 +29,6 @@ urlpatterns = [
     
     # Otras URLs de la API
     # path('api/gastos/', include('gastos.urls')),
-    # path('api/multas/', include('multas.urls')),
+    path('api/multas/', include('multas.urls')),
     # path('api/pagos/', include('pagos.urls')),
 ]
