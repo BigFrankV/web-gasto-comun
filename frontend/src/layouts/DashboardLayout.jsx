@@ -10,6 +10,7 @@ import {
   BellOutlined,
   SettingOutlined,
   FileTextOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -77,6 +78,12 @@ const DashboardLayout = () => {
       onClick: () => navigate('/gastos'),
     },
     {
+      key: 'multas',
+      icon: <WarningOutlined />,
+      label: 'Multas',
+      onClick: () => navigate('/multas'),
+    },
+    {
       key: 'notificaciones',
       icon: <BellOutlined />,
       label: 'Notificaciones',
@@ -103,6 +110,12 @@ const DashboardLayout = () => {
       icon: <DollarOutlined />,
       label: 'Mis Gastos',
       onClick: () => navigate('/mis-gastos'),
+    },
+    {
+      key: 'mis-multas',
+      icon: <WarningOutlined />,
+      label: 'Mis Multas',
+      onClick: () => navigate('/mis-multas'),
     },
     {
       key: 'mis-notificaciones',

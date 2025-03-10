@@ -1,0 +1,44 @@
+.mis-multas-container {
+  width: 100%;
+}
+
+.mis-multas-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.btn-pagar {
+  background-color: #52c41a;
+  border-color: #52c41a;
+}
+
+.btn-pagar:hover {
+  background-color: #73d13d;
+  border-color: #73d13d;
+}
+
+.detalle-multa p {
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.detalle-multa strong {
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mis-multas-card {
+    margin-bottom: 16px;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-btn {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+}

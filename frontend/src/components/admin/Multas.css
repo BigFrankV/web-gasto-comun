@@ -1,0 +1,52 @@
+.multas-container {
+  width: 100%;
+}
+
+.multas-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.estado-pendiente {
+  color: #faad14;
+  font-weight: 500;
+}
+
+.estado-pagado {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+/* Estilos para el formulario */
+.ant-form-item-label > label {
+  font-weight: 500;
+}
+
+/* Estilos para los botones de acción */
+.ant-btn-danger {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+  color: #fff;
+}
+
+.ant-btn-danger:hover {
+  background-color: #ff7875;
+  border-color: #ff7875;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .multas-card {
+    margin-bottom: 16px;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-btn {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+}

@@ -8,6 +8,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminDashboard from './components/admin/AdminDashboard';
 import ResidenteDashboard from './components/residente/ResidenteDashboard';
+import Multas from './components/admin/Multas';
+import MisMultas from './components/residente/MisMultas';
 import './App.css';
 
 // Componente para dirigir al usuario al dashboard correspondiente según su rol
@@ -35,6 +37,7 @@ function App() {
                   
                   {/* Rutas específicas para residentes */}
                   <Route path="/mis-gastos" element={<div>Mis Gastos (En construcción)</div>} />
+                  <Route path="/mis-multas" element={<MisMultas />} />
                   <Route path="/mis-notificaciones" element={<div>Mis Notificaciones (En construcción)</div>} />
                   <Route path="/perfil" element={<div>Mi Perfil (En construcción)</div>} />
                   <Route path="/cambio-password" element={<div>Cambio de Contraseña (En construcción)</div>} />
@@ -43,6 +46,7 @@ function App() {
                   <Route element={<ProtectedRoute requireAdmin={true} />}>
                     <Route path="/usuarios" element={<div>Gestión de Usuarios (En construcción)</div>} />
                     <Route path="/gastos" element={<div>Gestión de Gastos (En construcción)</div>} />
+                    <Route path="/multas" element={<Multas />} />
                     <Route path="/notificaciones" element={<div>Gestión de Notificaciones (En construcción)</div>} />
                     <Route path="/reportes" element={<div>Reportes (En construcción)</div>} />
                   </Route>
