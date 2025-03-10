@@ -1,0 +1,104 @@
+/* Estilos específicos para el menú lateral */
+.ant-layout-sider {
+  background: #001529;
+  overflow: visible;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  z-index: 10;
+}
+
+.ant-menu.ant-menu-dark {
+  background: #001529;
+}
+
+.ant-menu-dark .ant-menu-item {
+  padding-left: 24px !important;
+  margin: 0 !important;
+  height: 50px !important;
+  line-height: 50px !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #1890ff !important;
+}
+
+.ant-menu-dark .ant-menu-item:hover:not(.ant-menu-item-selected) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ant-menu-dark .ant-menu-item .ant-menu-item-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Estructura del contenedor del menú */
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px);
+}
+
+.main-menu {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.menu-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para el botón de cerrar sesión */
+.logout-menu {
+  background-color: #001529 !important;
+}
+
+.logout-menu-item {
+  color: #ff4d4f !important;
+}
+
+.logout-menu-item:hover {
+  background-color: rgba(255, 77, 79, 0.2) !important;
+}
+
+.ant-menu-item.logout-menu-item .ant-menu-item-icon {
+  color: #ff4d4f !important;
+}
+
+/* Ajustes para el logo */
+.logo {
+  padding: 16px;
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #002140;
+  margin-bottom: 0;
+}
+
+/* Ajustes para el menú colapsado */
+.ant-layout-sider-collapsed .logo {
+  padding: 16px 8px;
+}
+
+.ant-layout-sider-collapsed .ant-menu-item .anticon + span {
+  display: none;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    position: absolute;
+    min-height: 100vh;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .ant-layout-sider-collapsed {
+    transform: translateX(-80px);
+  }
+}

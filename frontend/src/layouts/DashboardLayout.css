@@ -1,0 +1,158 @@
+.dashboard-layout {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.dashboard-sider {
+  box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+  overflow: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  z-index: 10;
+}
+
+.logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background-color: #002140;
+}
+
+.dashboard-header {
+  padding: 0 24px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  width: 100%;
+  z-index: 9;
+  height: 64px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.welcome-message {
+  margin-right: 24px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.trigger {
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s;
+  padding: 0 24px;
+}
+
+.trigger:hover {
+  color: #1890ff;
+}
+
+.header-title {
+  margin: 0 0 0 12px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-content {
+  margin-top: 64px;
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: calc(100vh - 64px);
+}
+
+.user-info {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* Ajustes para el menú lateral */
+.ant-menu-dark {
+  background-color: #001529;
+}
+
+.ant-menu-dark .ant-menu-item {
+  color: rgba(255, 255, 255, 0.65);
+  height: 40px;
+  line-height: 40px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #1890ff;
+  color: #fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-sider {
+    position: absolute;
+    height: 100vh;
+  }
+  
+  .header-title {
+    display: none;
+  }
+  
+  .user-name {
+    display: none;
+  }
+  
+  .welcome-message {
+    display: none;
+  }
+  
+  .dashboard-content {
+    padding: 16px;
+  }
+}
+
+/* Ensure content is properly offset when sidebar is open */
+.site-layout {
+  transition: all 0.2s;
+}
+
+.site-layout.sidebar-open {
+  margin-left: 200px;
+}
+
+.site-layout.sidebar-closed {
+  margin-left: 80px;
+}
+
+@media (max-width: 768px) {
+  .site-layout.sidebar-open,
+  .site-layout.sidebar-closed {
+    margin-left: 0;
+  }
+}

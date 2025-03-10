@@ -1,0 +1,44 @@
+.admin-dashboard {
+  width: 100%;
+}
+
+.stats-row {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.dashboard-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.estado-pagado {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.estado-pendiente {
+  color: #faad14;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .stats-row {
+    margin-bottom: 16px;
+  }
+  
+  .dashboard-card {
+    margin-bottom: 16px;
+  }
+}

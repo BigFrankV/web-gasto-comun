@@ -1,0 +1,50 @@
+/* Estilos globales para la aplicación */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Estilos para el layout principal */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-container {
+  flex: 1;
+  padding: 24px;
+}
+
+/* Estilos para tarjetas y componentes comunes */
+.card-container {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.section-title {
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* Estilos para tablas */
+.custom-table {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 16px;
+  }
+}
+
+/* Estilos para pantallas grandes */
+@media (min-width: 1200px) {
+  .content-container {
+    padding: 32px;
+  }
+}
